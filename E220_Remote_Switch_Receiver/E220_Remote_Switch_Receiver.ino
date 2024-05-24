@@ -1,4 +1,5 @@
 //E220_Remote_Switch_Receiver.ino
+//Updated 05/24/2024 @ 18:05 EST
 
 /*
  * EBYTE LoRa E220
@@ -57,6 +58,9 @@ const int pulseDuration = 1000;  // 100 milliseconds (adjust as needed)
 
 #define RXD1 16
 #define TXD1 17
+
+#define SDA 22
+#define SCL 13
 
 #define TRIGGER 23  //INA226 Power Monitor
 #define SWITCH 2  //KY002S  Mosfet switch
@@ -163,7 +167,11 @@ void setup() {
   Serial2.begin(9600, SERIAL_8N1, RXD1, TXD1);  // for LoRa E220  delay(500);
   delay(500);
 
-  Wire.begin(22, 13);
+  bool fsok = LittleFS.begin(true);
+  Serial.printf_P(PSTR("\nFS init: %s\n"), fsok ? PSTR("ok") : PSTR("fail!"));
+
+
+  Wire.begin(SDA, SCL);
 
   pinMode(AUX_PIN, INPUT);  //ESP32 pin 18
   pinMode(TRIGGER, OUTPUT);  //ESP32 pin 23
@@ -175,8 +183,8 @@ void setup() {
 
   pinMode(AUX_PIN, INPUT);
 
-  //if(!ina226.init()){
-  //  Serial.println("Failed to init INA226. Check your wiring.");
+  if(!ina226.init()){
+    Serial.println("\nFailed to init INA226. Check your wiring.");
     //while(1){}
   }
   
@@ -293,7 +301,7 @@ void loop() {
       // Print the data received
       Serial.println(rsc.status.getResponseDescription());
       struct Message message = *(Message*) rsc.data;
-      Serial.println(message.switchState);
+      //Serial.println(message.switchState);
       Serial.println(message.timestamp);
       rsc.close();
   
@@ -301,13 +309,7 @@ void loop() {
       
       e220ttl.setMode(MODE_0_NORMAL);
       delay(1000);
-      
-      //Do not see this returned
-      Serial.println("WakeUp Callback, AUX_PIN pin go LOW and start receive message!");
-
-      // Work only with full connection
-      //e220ttl.setMode(MODE_0_NORMAL);  ////////////////////////////////////////
-
+ 
       ResponseStatus rsSend = e220ttl.sendFixedMessage(0, DESTINATION_ADDL, 68, "We have received the message!");
       // Check If there is some problem of succesfully send
       Serial.println(rsSend.getResponseDescription());
