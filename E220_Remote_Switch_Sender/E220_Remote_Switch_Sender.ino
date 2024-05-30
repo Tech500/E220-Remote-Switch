@@ -1,4 +1,7 @@
-//  E220_Remote_Switch_Sender.ino
+//E220_Remote_Switch_Sender.ino
+//William Lucid 5/29/2024 @ 22:59 EST
+
+//  Modification for battery voltage monitoring
 //  See library downloads for each library license.
 
 // With FIXED SENDER configuration
@@ -12,9 +15,12 @@
 #include "LoRa_E220.h"
 #include <AsyncTCP.h>
 #include "ESPAsyncWebServer.h"
+#include <esp_sleep.h>
 #include <Ticker.h>
 
 #import "index7.h"  //Video feed HTML; do not remove
+
+#define FREQENCY_915
 
 WiFiClient client;
 
@@ -30,8 +36,6 @@ char replyPacket[] = "Hi there! Got the message :-)";
 const char * udpAddress1 = "pool.ntp.org";
 const char * udpAddress2 = "time.nist.gov";
 
-String dtStamp;
-
 #define TZ "EST+5EDT,M3.2.0/2,M11.1.0/2"
 
 int DOW, MONTH, DATE, YEAR, HOUR, MINUTE, SECOND;
@@ -41,12 +45,15 @@ char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursd
 char strftime_buf[64];
 
 // ---------- esp32 pins --------------
- LoRa_E220 e220ttl(&Serial2, 18, 21, 19); //  RX AUX_PIN M0 M1
+ LoRa_E220 e220ttl(&Serial2, 33, 21, 19); //  RX AUX M0 M1
 
-//LoRa_E220 e220ttl(&Serial2, 22, 4, 18, 21, 19, UART_BPS_RATE_9600); //  esp32 RX <-- e220 TX, esp32 TX --> e220 RX AUX_PIN M0 M1
+//LoRa_E220 e220ttl(&Serial2, 22, 4, 33, 21, 19, UART_BPS_RATE_9600); //  esp32 RX <-- e220 TX, esp32 TX --> e220 RX AUX_PIN M0 M1
 // -------------------------------------
 
-#define AUX_PIN 18
+#define AUX_PIN GPIO_NUM_33
+
+#define RXD1 16
+#define TXD1 17
 
 // Replace with your network details
 const char *ssid = "R2D2";
@@ -69,10 +76,14 @@ struct DateTime {
 // Define the maximum length for the timestamp
 const int MAX_TIMESTAMP_LENGTH = 30;
 
+int switchState;
+
 struct Message {
  int switchState;
  char timestamp[MAX_TIMESTAMP_LENGTH];
 }message;
+
+char dtStamp[MAX_TIMESTAMP_LENGTH];
 
 Ticker oneTick;
 Ticker onceTick;
@@ -118,8 +129,14 @@ void setup() {
   Serial.begin(9600);
   delay(500);
 
-  pinMode(AUX_PIN, OUTPUT);
+   Serial2.begin(9600, SERIAL_8N1, RXD1, TXD1);  // for LoRa E220  delay(500);
+   delay(500);
   
+  pinMode(AUX_PIN, INPUT);
+
+  //attachInterrupt(GPIO_NUM_33, interruptHandler, FALLING);
+  attachInterrupt(digitalPinToInterrupt(GPIO_NUM_33), interruptHandler, FALLING);
+
   // Startup all pins and UART
   e220ttl.begin();
 
@@ -132,10 +149,8 @@ void setup() {
   // Check If there is some problem of succesfully send
   Serial.println(rs.getResponseDescription());
 
-  //  e220ttl.setMode(MODE_0_NORMAL);
-
   Serial.println("\n\n\nWebserver and");
-  Serial.println("E220-900T30D Transceiver for turning ON Videofeed\n");
+  Serial.println("E220-900T30D Remote Switch\n");
 
   wifi_Start();
 
@@ -143,7 +158,6 @@ void setup() {
   // See https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv for Timezone codes for your region
   setenv("TZ", "EST+5EDT,M3.2.0/2,M11.1.0/2", 3);   // this sets TZ to Indianapolis, Indiana
 
-  attachInterrupt(digitalPinToInterrupt(AUX_PIN), interruptHandler, FALLING);
 
   server.on("/relay", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send_P(200, PSTR("text/html"), HTML7, processor7);
@@ -161,7 +175,7 @@ void loop() {
 
   DateTime currentDateTime = getCurrentDateTime();	
   
-  if((currentDateTime.minute % 2 == 0) && (currentDateTime.second == 0)){
+  if((currentDateTime.minute % 15 == 0) && (currentDateTime.second == 0)){
     //webInterface();  //Sends URL Get request to wake up Radio and ESP32 at 1 minute interval
                       // URL = http://10.0.0.27/relay	 
     //delay(1000);
@@ -192,30 +206,23 @@ void loop() {
   }
     
   if (Serial.available()) {
-    message.switchState = data;
-	  message.switchState = Serial.parseInt();
+    // Read switch state (assuming data is a single byte)
+    message.switchState = Serial.read();
 
-	  // Send message
-	  ResponseStatus rs = e220ttl.sendFixedMessage(0, DESTINATION_ADDL, 66, &message, sizeof(Message));
-
-	  // Check If there is some problem of succesfully send
-	  Serial.println(rs.getResponseDescription());
-  }  
-}
-
-int main() {
-    // Create an instance of the Message struct
-    Message message;
-
-    // Get the timestamp using the get_time function and assign it to the struct member
-    String timestamp = get_time();
+    // Get timestamp (assuming a string format)
+    String timestamp = get_time(); // Replace with your timestamp function
     timestamp.toCharArray(message.timestamp, MAX_TIMESTAMP_LENGTH);
 
-    // Now you can use message.timestamp as needed...
+    message.timestamp[0] = Serial.read();
 
-    return 0;
+    // Send message
+    ResponseStatus rs = e220ttl.sendFixedMessage(0, DESTINATION_ADDL, 66, &message, sizeof(Message));
+
+    // Check for successful send
+    Serial.println(rs.getResponseDescription());
+  }
 }
-
+      
 String processor7(const String &var) {
 
   //index7.h
@@ -271,7 +278,7 @@ void countdownTrigger() {
   //getDateTime();
   // Schedule the next countdown if needed
   if (needAnotherCountdown == 1) {
-    onceTick.once(30, ISRcamera);
+    onceTick.once(120, ISRcamera);
     int data = 1;
     switchOne(data);
     needAnotherCountdown = 0;
