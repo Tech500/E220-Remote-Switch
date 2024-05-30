@@ -1,5 +1,5 @@
 //E220_Remote_Switch_Receiver.ino
-//William Lucid 5/29/2024 @ 22:59 EST
+//William Lucid 5/30/2024 @ 17:04 EST
 
 /*
  * EBYTE LoRa E220
@@ -25,7 +25,7 @@
 // with this DESTINATION_ADDL 2 you must set
 // WOR SENDER configuration to the other device and
 // WOR RECEIVER to this device
-#define DESTINATION_ADDL 3
+#define DESTINATION_ADDL 2
 
 // If you want use RSSI uncomment //#define ENABLE_RSSI true
 // and use relative configuration with RSSI enabled
@@ -98,8 +98,8 @@ struct DateTime {
 const int MAX_TIMESTAMP_LENGTH = 30;
 
 struct Message {
- volatile int switchState;
- char timestamp[MAX_TIMESTAMP_LENGTH];
+  volatile int switchState;
+  char timestamp[MAX_TIMESTAMP_LENGTH];
 };
 
 Message message;
@@ -114,7 +114,7 @@ void callback() {
   Serial.flush();
 }
 
-volatile bool interruptExecuted = false; // Ensure interruptExecuted is volatile
+volatile bool interruptExecuted = false;  // Ensure interruptExecuted is volatile
 
 
 void IRAM_ATTR wakeUp() {
@@ -150,23 +150,23 @@ LoRa_E220 e220ttl(&Serial2, 33, 21, 19);  //  RX AUX M0 M1
 //LoRa_E220 e220(&Serial2, 16, 17); // TX, RX pins//  esp32 RX <-- e22 TX, esp32 TX --> e22 RX AUX M0 M1
 // -------------------------------------
 
-void print_wakeup_reason(){
+void print_wakeup_reason() {
   esp_sleep_wakeup_cause_t wakeup_reason;
 
   wakeup_reason = esp_sleep_get_wakeup_cause();
 
-  switch(wakeup_reason){
-    case ESP_SLEEP_WAKEUP_EXT0 : Serial.println("Wakeup caused by external signal using RTC_IO"); break;
-    case ESP_SLEEP_WAKEUP_EXT1 : Serial.println("Wakeup caused by external signal using RTC_CNTL"); break;
-    case ESP_SLEEP_WAKEUP_TIMER : Serial.println("Wakeup caused by timer"); break;
-    case ESP_SLEEP_WAKEUP_TOUCHPAD : Serial.println("Wakeup caused by touchpad"); break;
-    case ESP_SLEEP_WAKEUP_ULP : Serial.println("Wakeup caused by ULP program"); break;
-    default : Serial.printf("Wakeup was not caused by deep sleep: %d\n",wakeup_reason); break;
+  switch (wakeup_reason) {
+    case ESP_SLEEP_WAKEUP_EXT0: Serial.println("Wakeup caused by external signal using RTC_IO"); break;
+    case ESP_SLEEP_WAKEUP_EXT1: Serial.println("Wakeup caused by external signal using RTC_CNTL"); break;
+    case ESP_SLEEP_WAKEUP_TIMER: Serial.println("Wakeup caused by timer"); break;
+    case ESP_SLEEP_WAKEUP_TOUCHPAD: Serial.println("Wakeup caused by touchpad"); break;
+    case ESP_SLEEP_WAKEUP_ULP: Serial.println("Wakeup caused by ULP program"); break;
+    default: Serial.printf("Wakeup was not caused by deep sleep: %d\n", wakeup_reason); break;
   }
 }
 
 void enterDeepSleep() {
-  esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM, ESP_PD_OPTION_ON); 
+  esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM, ESP_PD_OPTION_ON);
   gpio_hold_en(GPIO_NUM_19);
   gpio_hold_en(GPIO_NUM_21);
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, 0);
@@ -186,7 +186,7 @@ void setup() {
 
   print_wakeup_reason();
 
-  pinMode(AUX_PIN, INPUT);
+  pinMode(AUX_PIN, INPUT_PULLUP);
 
   //attachInterrupt(GPIO_NUM_33, wakeUp, FALLING);
   attachInterrupt(digitalPinToInterrupt(GPIO_NUM_33), wakeUp, FALLING);  //E220 AUX
@@ -197,7 +197,7 @@ void setup() {
   Wire.begin(SDA, SCL);
 
   pinMode(TRIGGER, OUTPUT);  //ESP32, GPIO23
-  pinMode(ALERT, INPUT);     //ESP32, GPIO4
+  pinMode(ALERT, OUTPUT);    //ESP32, GPIO4
 
   if (!ina226.init()) {
     Serial.println("\nFailed to init INA226. Check your wiring.");
@@ -274,28 +274,55 @@ void setup() {
 
   //Configured with Ebyte ,RF Setting software.
 
-  //attachInterrupt(digitalPinToInterrupt(GPIO_NUM_33), wakeUp, LOW);  //E220 AUX
+  esp_sleep_wakeup_cause_t wakeup_reason;
 
-  esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
+  wakeup_reason = esp_sleep_get_wakeup_cause();
 
-  if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT0) {
-    Serial.println("Waked up from WOR remote Wakeup!");
+  if (ESP_SLEEP_WAKEUP_EXT0 == wakeup_reason) {
+    Serial.println("Waked up from external GPIO!");
 
     gpio_hold_dis(GPIO_NUM_21);
     gpio_hold_dis(GPIO_NUM_19);
+
     gpio_deep_sleep_hold_dis();
+
+    e220ttl.setMode(MODE_0_NORMAL);
 
     delay(1000);
 
     e220ttl.sendFixedMessage(0, DESTINATION_ADDL, 66, "We have waked up from message, but we can't read It!");
+  } else {
+    e220ttl.setMode(MODE_2_POWER_SAVING);
+
+    delay(1000);
+    Serial.println();
+    Serial.println("Start sleep!");
+    delay(100);
+
+    if (ESP_OK == gpio_hold_en(GPIO_NUM_21)) {
+      Serial.println("HOLD 21");
+    } else {
+      Serial.println("NO HOLD 21");
+    }
+    if (ESP_OK == gpio_hold_en(GPIO_NUM_19)) {
+      Serial.println("HOLD 19");
+    } else {
+      Serial.println("NO HOLD 19");
+    }
+
+    esp_sleep_enable_ext0_wakeup(GPIO_NUM_33, LOW);
+
+    gpio_deep_sleep_hold_en();
+    //Go to sleep now
+    Serial.println("Going to sleep now");
+    //esp_deep_sleep_start();
+
+    delay(1);
   }
-  //e220ttl.setMode(MODE_0_NORMAL);
-  //delay(1000);
-  
+  //  e220ttl.setMode(MODE_0_NORMAL);
+  //  delay(1000);
   Serial.println();
   Serial.println("Wake and start listening!");
-
- 
 }
 
 // The loop function is called in an endless loop
@@ -307,22 +334,23 @@ void loop() {
 
     ResponseStructContainer rsc = e220ttl.receiveMessage(sizeof(Message));
     // Is something goes wrong print error
-    if (rsc.status.code!=1){
+    if (rsc.status.code != 1) {
       Serial.println(rsc.status.getResponseDescription());
-    }else{
+    } else {
       // Print the data received
       Serial.println(rsc.status.getResponseDescription());
-      struct Message message = *(Message*) rsc.data;
+      struct Message message = *(Message*)rsc.data;
       Serial.println(message.switchState);  //This prints to monitor
-      Serial.println(message.timestamp);  //This prints to monitor
+      Serial.println(message.timestamp);    //This prints to monitor
 
       data = message.switchState;
-      //rsc.close();  
+      //rsc.close();
 
-      
-     Serial.print("data:  "); Serial.println(data);;
 
-    }    
+      Serial.print("data:  ");
+      Serial.println(data);
+      ;
+    }
 
     e220ttl.setMode(MODE_0_NORMAL);
     delay(1000);
@@ -330,19 +358,20 @@ void loop() {
     ResponseStatus rsSend = e220ttl.sendFixedMessage(0, DESTINATION_ADDL, 66, "We have received the message!");
     // Check If there is some problem of succesfully send
     Serial.println(rsSend.getResponseDescription());
-    delay(10);    
+    delay(10);
 
     Serial.println("Gets here 2");
 
-    Serial.print("data before interrupt:  "); Serial.println(data);
- 
-    Serial.println("WakeUp Callback, AUX pin go LOW and start receive message!\n"); 
- 
+    Serial.print("data before interrupt:  ");
+    Serial.println(data);
+
+    Serial.println("WakeUp Callback, AUX pin go LOW and start receive message!\n");
+
     if (interruptExecuted) {
       interruptExecuted = false;
 
       Serial.print("After Interrupt:  ");
-      Serial.println(data); 
+      Serial.println(data);
 
       //------------------------- Task execution ------------------------------
 
@@ -356,8 +385,8 @@ void loop() {
         getINA226(dtStamp);
         char dtStamp[MAX_TIMESTAMP_LENGTH];
         strncpy(dtStamp, message.timestamp, MAX_TIMESTAMP_LENGTH);  // Copy timestamp
-
         //logBattery(dtStamp); // Pass temporary copy
+        enterDeepSleep();
       }
 
       if (data == 2) {
@@ -372,15 +401,20 @@ void loop() {
       }
 
       if (event) {
+        digitalWrite(TRIGGER, HIGH);
+        delay(pulseDuration);
+        digitalWrite(TRIGGER, LOW);
         ina226.readAndClearFlags();  // reads interrupt and overflow flags and deletes them
         //getINA226(dtStamp);  //displayResults();
         attachInterrupt(digitalPinToInterrupt(ALERT), alert, FALLING);
         event = false;
         digitalWrite(TRIGGER, LOW);
         ina226.readAndClearFlags();
-      }     
+        enterDeepSleep();
+      }
+      //----------------------End Task Execution ------------------------
 
-      //----------------------End Task Execution ------------------------ 
+      data = 0;
     }
   }
 }
@@ -395,7 +429,7 @@ int main() {
 
   // Now you can use message.timestamp as needed...
 
-   return 0;
+  return 0;
 }
 
 // Function to get the timestamp
@@ -423,7 +457,7 @@ void getINA226(const char* dtStamp) {
   checkForI2cErrors();
 
   Serial.println(dtStamp);
-  Serial.print("\nShunt Voltage [mV]: ");
+  Serial.print("Shunt Voltage [mV]: ");
   Serial.println(shuntVoltage_mV);
   Serial.print("Bus Voltage [V]: ");
   Serial.println(busVoltage_V);
