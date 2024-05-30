@@ -1,6 +1,8 @@
 //E220_Remote_Switch_Receiver.ino
 //William Lucid 5/30/2024 @ 17:04 EST
 
+//Project requires Ebyte 900T30D, KY002S MOSFET Switch, and INA226 Battery Monitor module.
+
 /*
  * EBYTE LoRa E220
  * Stay in sleep mode and wait a wake up WOR message
@@ -16,7 +18,7 @@
  * M1         ----- 21 (or GND)
  * RX         ----- TX2 (PullUP)
  * TX         ----- RX2 (PullUP)
- * AUX        ----- 18  (PullUP)
+ * AUX        ----- 33  (PullUP)
  * VCC        ----- 3.3v/5v
  * GND        ----- GND
  *
