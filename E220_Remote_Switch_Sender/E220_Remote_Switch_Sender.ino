@@ -1,11 +1,12 @@
 //E220_Remote_Switch_Sender.ino
-//William Lucid 5/30/2024 @ 17:04 EST
+//William Lucid 5/29/2024 @ 22:59 EST
 
 //  Modification for battery voltage monitoring
 //  See library downloads for each library license.
 
 // With FIXED SENDER configuration
 #define DESTINATION_ADDL 3
+
 
 #include <Arduino.h>
 #include "WiFi.h"
@@ -56,8 +57,8 @@ char strftime_buf[64];
 #define TXD1 17
 
 // Replace with your network details
-const char *ssid = "XXXXX";
-const char *password = "XXXXXXX";
+const char *ssid = "XXXXXXXX";
+const char *password = "XXXXXXXXX";
 
 AsyncWebServer server(80);
 
@@ -278,7 +279,7 @@ void countdownTrigger() {
   //getDateTime();
   // Schedule the next countdown if needed
   if (needAnotherCountdown == 1) {
-    onceTick.once(120, ISRcamera);
+    onceTick.once(60, ISRcamera);
     int data = 1;
     switchOne(data);
     needAnotherCountdown = 0;
