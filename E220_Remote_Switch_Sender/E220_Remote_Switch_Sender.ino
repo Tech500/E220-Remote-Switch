@@ -1,11 +1,11 @@
 //E220_Remote_Switch_Sender.ino
-//William Lucid 5/29/2024 @ 22:59 EST
+//William Lucid 5/30/2024 @ 17:04 EST
 
 //  Modification for battery voltage monitoring
 //  See library downloads for each library license.
 
 // With FIXED SENDER configuration
-#define DESTINATION_ADDL 2
+#define DESTINATION_ADDL 3
 
 #include <Arduino.h>
 #include "WiFi.h"
@@ -56,8 +56,8 @@ char strftime_buf[64];
 #define TXD1 17
 
 // Replace with your network details
-const char *ssid = "R2D2";
-const char *password = "sissy4357";
+const char *ssid = "XXXXX";
+const char *password = "XXXXXXX";
 
 AsyncWebServer server(80);
 
