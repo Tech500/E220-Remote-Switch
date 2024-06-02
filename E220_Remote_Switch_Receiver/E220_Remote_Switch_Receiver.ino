@@ -1,7 +1,7 @@
 //E220_Remote_Switch_Receiver.ino
 //William Lucid 5/30/2024 @ 17:04 EST
 
-//Project requires Ebyte 900T30D, KY002S MOSFET Switch, and INA226 Battery Monitor module.
+//Project requires Ebyte E220-900T30D, KY002S MOSFET Switch, and INA226 Battery Monitor module.
 
 /*
  * EBYTE LoRa E220
