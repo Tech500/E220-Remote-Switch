@@ -1,7 +1,6 @@
 //  E220_Remote_Switch_Receiver.ino
 //  06/29/2024  11:17 EST
 //  William Lucid
-//  "M:\E220_Struct_Code"
 
 #include "Arduino.h"
 #include "LoRa_E220.h"
