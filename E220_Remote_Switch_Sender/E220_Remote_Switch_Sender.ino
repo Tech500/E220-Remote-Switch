@@ -2,6 +2,22 @@
 //  06/27/2024  13:22 EST
 //  William Lucid
 
+ /*  Renzo Mischianti <https://mischianti.org>
+ *
+ * https://mischianti.org
+ *
+ * E220          ----- esp32         
+ * M0            ----- 19 (or 3.3v)  
+ * M1            ----- 21 (or GND)   
+ * TX            ----- TX2 (PullUP)  
+ * RX            ----- RX2 (PullUP)  
+ * AUX           ----- 15  (PullUP)   //Pin 15 is what is given in the Lora e220 constructor.
+ * VCC           ----- 3.3v/5v       
+ * GND           ----- GND           
+ *
+ *  Connections confirmed DMM continuity tests.
+ */
+
 #include <Arduino.h>
 #include "WiFi.h"
 #include <WiFiUdp.h>
