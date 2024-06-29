@@ -2,7 +2,7 @@
 //  06/29/2024  11:17 EST
 //  William Lucid
 
-Renzo Mischianti <https://mischianti.org>
+ /*  Renzo Mischianti <https://mischianti.org>
  *
  * https://mischianti.org
  *
