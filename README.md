@@ -1,5 +1,5 @@
-E220-Remote-Switch project utilizing two Ebye, E220-900T30D RF modules and two ESP32 microcontrollers.
-Current status:  INA226 and KY002S have not been fully implemented in this update.
+E220-Remote-Switch project utilizes two, Ebye E220-900T30D RF modules and two, ESP32 microcontrollers.
+Current project status:  INA226 and KY002S have not been implemented in this update.
 
 Demonstation mode:
 
@@ -14,5 +14,8 @@ Demonstation mode:
 
 Three advantages of using the Ebyte, E220-900T30D is increased distance 10 km (estimated at power of 30 dbm) and
 Sleep current of 5 uA.  E220-900T30D third feature is the ability to send a WOR message to wake up the receiving 
-transciver allowing second message to awaken deep sleeping ESP32 receiver. Transmit current of 620 mA is almost 
-instantaneous at 30dbm to send; up to 200 bytes, before dropping to sleep current.
+transciver allowing second message; to turn on battery power. 
+
+Transmit current of 620 mA is almost instantaneous at 30dbm to send; up to 200 bytes, before dropping to sleep 
+current.  Receiving current; for a message, 17.2 mA.  Current values are from "Ebytes E220-900T30D User 
+Manual". 
