@@ -3,6 +3,9 @@ Current project status:  INA226 and KY002S have not been implemented in this upd
 
 Demonstation mode:
 
+Requires Sender E220-900T30D module to be configured ADDL = 3 and sketch Destination ADDL = 2.
+Requires Receiver E220-900T30D module to be configured ADDL = 2 and sketch Destination ADDL = 3.
+
 1.  ESP32 Receiver; push receiver reset button, this puts the ESP32 into deep sleep.
 2.  ESP32 Sender; push sender reset button, this sends Wake on radio (WOR) message to wake ESP32 receiver
     from deep sleep.
