@@ -1,10 +1,9 @@
 E220-Remote-Switch project utilizes two, Ebye E220-900T30D RF modules and two, ESP32 microcontrollers.
 Current project status:  INA226 and KY002S have not been implemented in this update.
 
-Demonstation mode:
+[E220-Remote-Switch Demo Video](https://drive.google.com/file/d/17vEiuXHJrnUdlfjQXX05xNBP8ygv8aMq/view?usp=sharing)
 
-Requires Sender E220-900T30D module to be configured ADDL = 3 and sketch Destination ADDL = 2.
-Requires Receiver E220-900T30D module to be configured ADDL = 2 and sketch Destination ADDL = 3.
+Demonstation mode:
 
 1.  ESP32 Receiver; push receiver reset button, this puts the ESP32 into deep sleep.
 2.  ESP32 Sender; push sender reset button, this sends Wake on radio (WOR) message to wake ESP32 receiver
