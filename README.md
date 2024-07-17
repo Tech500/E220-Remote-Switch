@@ -1,4 +1,4 @@
-E220-Remote-Switch project utilizing two Ebye, E220-900T30D RF modules and two eSP32 microcontrollers.
+E220-Remote-Switch project utilizing two Ebye, E220-900T30D RF modules and two ESP32 microcontrollers.
 Current status:  INA226 and KY002S have not been fully implemented in this update.
 
 Demonstation mode:
