@@ -1,6 +1,6 @@
 
 //E220_Remote_Switch_Sender.ino
-//William Lucid 7/16/2024 @ 19:25 EST
+//William Lucid 07/19/2024 @ 19:41 EST
 
 //E220 Module is set to ADDL 3
 
@@ -32,7 +32,7 @@
 
 #define AUX_PIN GPIO_NUM_15
 
-int delayTime = 300;  //setmode delay duration
+int delayTime = 400;  //setmode delay duration
 
 WiFiClient client;
 
@@ -86,8 +86,8 @@ const int MAX_dateTime_LENGTH = 30;
 int switchState;
 
 struct Message {
- int switchState;
- char dateTime[MAX_dateTime_LENGTH];  // Array to hold date/time string
+  int switchState;
+  char dateTime[MAX_dateTime_LENGTH];  // Array to hold date/time string
 };
 
 Message message;
@@ -131,13 +131,21 @@ void interruptHandler() {
   got_interrupt = true;
 }  
 
+void sendWOR(){
+  e220ttl.setMode(MODE_1_WOR_TRANSMITTER);
+  delay(delayTime);
+  // Send message
+  ResponseStatus rs = e220ttl.sendFixedMessage(0, DESTINATION_ADDL, CHANNEL, "Hello, world? WOR!");
+  e220ttl.setMode(MODE_0_NORMAL);
+  delay(delayTime);
+}
+
 void setup() {
   Serial.begin(9600);
   delay(500);
 
   Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
-  Serial2.println("Hello, world?");
-
+  
   Message message;
   message.switchState = data;
   String dateTimeStr = get_time();
@@ -158,13 +166,8 @@ void setup() {
   e220ttl.setMode(MODE_1_WOR_TRANSMITTER);
   delay(delayTime);
 
-  Serial.println("Hi, I'm going to send WOR message!");
-
-  // Send message
-  ResponseStatus rs = e220ttl.sendFixedMessage(0, DESTINATION_ADDL, CHANNEL, "Hello, world? WOR!");
-  // Check If there is some problem of succesfully send
-  Serial.println(rs.getResponseDescription());
-
+  //sendWOR();
+ 
   e220ttl.setMode(MODE_0_NORMAL);
   delay(delayTime);
 
@@ -178,6 +181,7 @@ void setup() {
 
   server.on("/relay", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send_P(200, PSTR("text/html"), HTML7, processor7);
+    sendWOR();
     data = 1;
     needAnotherCountdown = 1;
     countdownTrigger();
@@ -279,7 +283,7 @@ void countdownTrigger() {
   // Schedule the next countdown if needed
   if (needAnotherCountdown == 1) {
     onceTick.once(60, ISRcamera);
-    int data = 1;
+    data = 1;
     switchOne(data);
     needAnotherCountdown = 0;
   }
@@ -314,20 +318,22 @@ String get_time() {
 
 void switchOne(int data) {
   if (data == 1) {
-    int data = 1;
-    Serial.println("\nBattery Switch is ON");
-    Serial.println("ESP32 waking from Deep Sleep\n");
+    Serial.println("\nWaked up from external GPIO!");
+    Serial.println("Wake and start listening!\n");
+    delay(500);
+    Serial.println("\nESP32 waking from Deep Sleep");  
+    Serial.println("Battery Switch is ON\n"); 
   }
 
   if (data == 2) {
-    int data = 2;
     Serial.println("\nBattery power switched OFF");
     Serial.println("ESP32 going to Deep Sleep\n");
   }
 
   Serial.println("Hi, I'm going to send message!");
 
-  e220ttl.setMode(MODE_0_NORMAL);
+  e220ttl.setMode(MODE_1_WOR_TRANSMITTER);
+  
   delay(delayTime);
   
   get_time();
@@ -344,19 +350,45 @@ void switchOne(int data) {
     message.dateTime[MAX_dateTime_LENGTH - 1] = '\0'; // Ensure null-termination
   }
 
-    //emulate interrupt
-  digitalWrite(AUX_PIN, LOW);
-  delay(delayTime);
-  digitalWrite(AUX_PIN, HIGH);
-  
   Serial.print("switchState:  "); Serial.println(message.switchState);
   Serial.print("dateTime:  "); Serial.println(message.dateTime);
 
   // Send message
   ResponseStatus rs = e220ttl.sendFixedMessage(0, DESTINATION_ADDL, CHANNEL, &message, sizeof(Message));
   // Check If there is some problem of succesfully send
-  Serial.println(rs.getResponseDescription());  
+    Serial.println(rs.getResponseDescription());  
 }  
+
+
+int sendMessage(int data){
+  Serial.println("Hi, I'm going to send message!");
+
+  e220ttl.setMode(MODE_1_WOR_TRANSMITTER);
+  
+  delay(delayTime);
+  
+  get_time();
+
+  Message message; 
+
+  //Initialize struct members
+  message.switchState = data;
+ 
+  // Initialize the dateTime 
+  String dateTimeStr = get_time();
+  if (!dateTimeStr.isEmpty()) {
+    strncpy(message.dateTime, dateTimeStr.c_str(), MAX_dateTime_LENGTH - 1);
+    message.dateTime[MAX_dateTime_LENGTH - 1] = '\0'; // Ensure null-termination
+  }
+
+  //Serial.print("switchState:  "); Serial.println(message.switchState);
+  //Serial.print("dateTime:  "); Serial.println(message.dateTime);
+
+  // Send message
+  ResponseStatus rs = e220ttl.sendFixedMessage(0, DESTINATION_ADDL, CHANNEL, &message, sizeof(Message));
+  // Check If there is some problem of succesfully send
+  Serial.println(rs.getResponseDescription());  
+}
 
 void webInterface() {
 
