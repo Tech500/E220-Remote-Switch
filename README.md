@@ -1,3 +1,5 @@
+Updated 07/19/2024  --Now with E220 Sleep Mode; reducing always on current to microamp range!
+
 E220-Remote-Switch project utilizes two, Ebye E220-900T30D RF modules and two, ESP32 microcontrollers.
 Current project status:  INA226 and KY002S have not been implemented in this update.
 
