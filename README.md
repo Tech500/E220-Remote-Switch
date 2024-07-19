@@ -18,6 +18,7 @@ Three advantages of using the Ebyte, E220-900T30D is increased distance 10 km (e
 Sleep current of 5 uA.  E220-900T30D third feature is the ability to send a WOR message to wake up the receiving 
 transciver allowing second message; to turn on battery power. 
 
-Transmit current of 620 mA is almost instantaneous at 30dbm to send; up to 200 bytes, before dropping to sleep 
-current.  Receiving current; for a message, 17.2 mA.  Current values are from "Ebytes E220-900T30D User 
-Manual". 
+Transmit current of 620 mA is almost instantaneous at 30dbm to send; up to 200 bytes, before dropping to sleep current. 
+Receiving current; for a message, 17.2 mA. Current values are from "Ebytes E220-900T30D User Manual". Measured Standby 
+current 11.8 mA. (E220, Always powered on). Ultilizing E220 Sleep Mode, Sleep current (E220, Always on) ranges from .54 uA
+to 97.33 uA measured!
