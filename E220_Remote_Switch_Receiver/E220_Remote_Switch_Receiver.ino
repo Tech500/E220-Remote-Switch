@@ -1,5 +1,5 @@
 //E220_Remote_Switch_Receiver.ino
-//William Lucid 7/16/2024 @ 19:25 EST
+//William Lucid 7/19/2024 @ 19:41 EST
 
 //E220 Module is set to ADDL 2
 
@@ -37,6 +37,10 @@ const int pulseDuration = 300;  // 100 milliseconds (adjust as needed)
 #define RXD2 16
 #define TXD2 17
 
+
+#define M0_PIN GPIO_NUM_21
+#define M1_PIN GPIO_NUM_19
+
 #define AUX_PIN GPIO_NUM_15
 #define TRIGGER 23  //KY002S MOSFET Bi-Stable Switch
 #define ALERT 4     //INA226 Battery Monitor
@@ -44,7 +48,7 @@ const int pulseDuration = 300;  // 100 milliseconds (adjust as needed)
 #define SDA 13
 #define SCL 22
 
-int delayTime = 300;  //setmode delay duration
+int delayTime = 400;  //setmode delay duration
 
 #define I2C_ADDRESS 0x40
 
@@ -93,7 +97,7 @@ bool interruptExecuted = false;  // Ensure interruptExecuted is volatile
 void IRAM_ATTR wakeUp() {
   // Do not use Serial on interrupt callback
   interruptExecuted = true;
-  //detachInterrupt(AUX_PIN);
+  detachInterrupt(AUX_PIN);
 }
 
 void printParameters(struct Configuration configuration);
@@ -128,7 +132,17 @@ void handleWakeupReason() {
   }
 }
 
+void enterSleepMode() {
+  // Set M0 and M1 to 1 to enter sleep mode
+  //digitalWrite(M0_PIN, HIGH);
+  //digitalWrite(M1_PIN, HIGH);
+  e220ttl.setMode(MODE_3_SLEEP);
+  // Delay to ensure the mode is set
+  delay(delayTime);
+}
+
 void enterDeepSleep() {
+  e220ttl.setMode(MODE_2_POWER_SAVING);
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_15, LOW);
   Serial.flush();  // Ensure all Serial data is sent before sleep
   gpio_hold_en(GPIO_NUM_21);
@@ -142,6 +156,14 @@ void enterDeepSleep() {
 void setup() {
   Serial.begin(9600);
   delay(1000);
+
+  Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2); // TX = 17, RX = 16
+  delay(500);
+
+  pinMode(M0_PIN, OUTPUT);
+  pinMode(M1_PIN, OUTPUT);
+
+  enterSleepMode();
 
   Serial.println("\n\nE220 Remote Switch Receiver\n");
 
@@ -170,7 +192,7 @@ void setup() {
 
   // Check if the wakeup was due to external GPIO
   if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT0) {
-    Serial.println("Waked up from external GPIO!");
+    //Serial.println("Waked up from external GPIO!");
 
     gpio_hold_dis(GPIO_NUM_21);
     gpio_hold_dis(GPIO_NUM_19);
@@ -195,7 +217,7 @@ void setup() {
     } else {
       Serial.println("NO HOLD 19");
     }
-
+    
     gpio_deep_sleep_hold_en();
     delay(1);
 
@@ -203,13 +225,17 @@ void setup() {
 
     esp_deep_sleep_start();
   }
-  Serial.println("Wake and start listening!");
+  //Serial.println("Wake and start listening!");
+
+     
 }
 
 void loop() {
 
   //Serial.println("Test deep sleep");
 
+  e220ttl.setMode(MODE_2_WOR_RECEIVER);
+  
   if (e220ttl.available() > 0) {
     Serial.println("\nMessage arrived!");
 
@@ -227,12 +253,14 @@ void loop() {
       Serial.println(rsSend.getResponseDescription());
       delay(10);
 
-      //if (interruptExecuted) {
-      //interruptExecuted = false;
+      e220ttl.setMode(MODE_0_NORMAL);
+      delay(delayTime);
 
-      //Serial.println("WakeUp Callback, AUX pin go LOW and start receive message!\n");
-
-      if (message.switchState == 1) {
+      enterSleepMode();
+      
+      if (message.switchState == 1 ) {
+        Serial.println("\nWaked up from external GPIO!");
+        Serial.println("Wake and start listening!\n");
         digitalWrite(TRIGGER, HIGH);
         delay(pulseDuration);
         digitalWrite(TRIGGER, LOW);
@@ -242,6 +270,7 @@ void loop() {
         //getINA226(message.dateTime);
         //enterDeepSleep();
       }
+     
 
       if (message.switchState == 2) {
         digitalWrite(TRIGGER, HIGH);
@@ -264,7 +293,7 @@ void loop() {
         digitalWrite(TRIGGER, LOW);
         ina226.readAndClearFlags();
         //enterDeepSleep();
-      }      
-    }    
+      }
+    }
   }
 }
