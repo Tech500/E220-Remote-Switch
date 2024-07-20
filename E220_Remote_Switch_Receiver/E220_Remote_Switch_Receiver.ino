@@ -48,7 +48,7 @@ const int pulseDuration = 300;  // 100 milliseconds (adjust as needed)
 #define SDA 13
 #define SCL 22
 
-int delayTime = 400;  //setmode delay duration
+int delayTime = 100;  //setmode delay duration
 
 #define I2C_ADDRESS 0x40
 
