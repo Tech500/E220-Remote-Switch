@@ -32,7 +32,7 @@
 
 #define AUX_PIN GPIO_NUM_15
 
-int delayTime = 400;  //setmode delay duration
+int delayTime = 100;  //setmode delay duration
 
 WiFiClient client;
 
