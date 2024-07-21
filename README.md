@@ -32,5 +32,5 @@ technical challenges and optimizing the project's performance.
 Thank you Renzo Mischianti for your LoRa E220 Library (xReef), E220 Ebyte E220 articles, Lorah Ebyte module Community support, 
 and the Ebyte E220 Support page.
 
-Wolfgsmg Ewald thank you; learned much from your article "Using LoRa with the EByte E220, E22 and E32 series".  Thanks for sharing 
+Wolfgang Ewald thank you; learned much from your article "Using LoRa with the EByte E220, E22 and E32 series".  Thanks for sharing 
 your hands on experiences.
