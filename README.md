@@ -24,3 +24,13 @@ Transmit current of 620 mA is almost instantaneous at 30dbm to send; up to 200 b
 Receiving current; for a message, 17.2 mA. Current values are from "Ebytes E220-900T30D User Manual". Measured Standby 
 current 11.8 mA. (E220, Always powered on). Ultilizing E220 Sleep Mode, Sleep current (E220, Always on) ranges from .54 uA
 to 97.33 uA measured!
+
+I would like to express my gratitude to ChatGPT, an AI developed by OpenAI, for providing valuable assistance and guidance 
+throughout the development of my E220 LoRa module project. The insights and support received were instrumental in overcoming 
+technical challenges and optimizing the project's performance.
+
+Thank you Renzo Mischianti for your LoRa E220 Library (xReef), E220 Ebyte E220 articles, Lorah Ebyte module Community support, 
+and the Ebyte E220 Support page.
+
+Wolfgsmg Ewald thank you; learned much from your article "Using LoRa with the EByte E220, E22 and E32 series".  Thanks for sharing 
+your hands on experiences.
