@@ -29,7 +29,7 @@ I would like to express my gratitude to ChatGPT, an AI developed by OpenAI, for 
 throughout the development of my E220 LoRa module project. The insights and support received were instrumental in overcoming 
 technical challenges and optimizing the project's performance.
 
-Thank you Renzo Mischianti for your LoRa E220 Library (xReef), E220 Ebyte E220 articles, Lorah Ebyte module Community support, 
+Thank you Renzo Mischianti for your LoRa E220 Library (xReef), E220 Ebyte E220 articles, Lora Ebyte module Community support, 
 and the Ebyte E220 Support page.
 
 Wolfgang Ewald thank you; learned much from your article "Using LoRa with the EByte E220, E22 and E32 series".  Thanks for sharing 
