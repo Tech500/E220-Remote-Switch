@@ -1,9 +1,9 @@
-//E220_Remote_Switch_Receiver.ino    Added KY002S Bi-Stable MOSFET Switch and INA226 Battery Monitor
-//William Lucid 07/27/2024 @ 21:54 EDT
+//E220_Remote_Switch_Receiver.ino   Added KY002S Bi-Stable MOSFET Switch and INA226 Battery Monitor
+//William Lucid 7/28/2024 @ 01:21 EDT
 
 //E220 Module is set to ADDL 2
 
-//Fully connectd schema  AUX connected to ESP32, GPIO15
+//Fully connectd schema  AUX connected to ESP32, GPIO15 --Important RTC_GPIO Pin 
 //Ardino IDE:  ESP32 Board Manager, Version 2.0.17
 
 //  See library downloads for each library license.
@@ -61,6 +61,8 @@ void alert() {
   detachInterrupt(ALERT);
 }
 
+volatile bool alertFlag = false;
+
 // Struct to hold date and time components
 struct DateTime {
   int year;
@@ -92,7 +94,6 @@ void callback() {
 }
 
 bool interruptExecuted = false;  // Ensure interruptExecuted is volatile
-
 
 void IRAM_ATTR wakeUp() {
   // Do not use Serial on interrupt callback
@@ -163,6 +164,7 @@ void setup() {
 
   Serial.println("\n\nE220 Remote Switch Receiver\n");
 
+  //Set default Trigger normal boot 
   digitalWrite(TRIGGER, LOW);
 
   // Increment boot number and print it every reboot
@@ -229,6 +231,7 @@ void setup() {
     gpio_deep_sleep_hold_en();
     delay(1);
 
+    //Set default Trigger going deep sleep
     digitalWrite(TRIGGER, LOW);
 
     esp_sleep_enable_ext0_wakeup(GPIO_NUM_15, LOW);
@@ -272,7 +275,6 @@ void loop() {
         Serial.println("\nBattery power switched ON");
         Serial.println("ESP32 wake from Deep Sleep\n");
         getINA226(message.dateTime);
-        //enterDeepSleep();
       }     
 
       if (message.switchState == 2) {
@@ -280,22 +282,17 @@ void loop() {
         Serial.println("\nBattery power switched OFF");
         Serial.println("ESP32 going to Deep Sleep\n");
         enterDeepSleep();
-      }
+      }   
 
-      /*
       if (event) {
-        Serial.println("Event triggered");
-        digitalWrite(TRIGGER, HIGH);
-        //delay(pulseDuration);
-        //digitalWrite(TRIGGER, LOW);
+        Serial.println("Under voltage alert");
+        alertFlag = true;
         ina226.readAndClearFlags();
-        attachInterrupt(digitalPinToInterrupt(ALERT), alert, FALLING);
+        //attachInterrupt(digitalPinToInterrupt(ALERT), alert, FALLING);
         event = false;
-        //digitalWrite(TRIGGER, LOW);
         ina226.readAndClearFlags();
         //enterDeepSleep();
-      }
-      */
+      }   
     }
   }
 }
@@ -374,6 +371,11 @@ void getINA226(const char* dtStamp) {
   log.print(current_mA, 3);
   log.print(" , ");
   log.print(power_mW, 3);
+  log.print(" , ");
+  if(alertFlag){
+    log.print("Under Voltage alert");
+    event = false;
+  }
   log.println("");
   log.close();
 }
