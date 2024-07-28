@@ -1,8 +1,8 @@
+Updated 07/28/2024 --Now included; KY002S Bi-Stable MOSFET switch and INA226 Battery Monitor
+
 Updated 07/23/2024  --Now with E220 Sleep Mode; reducing always on current to microamp range!
 
 [E220-Remote-Switch Demo video with sleep mode current monitoring](https://www.youtube.com/watch?v=_cuUFP5C3NI)
-
-[](url)
 
 Demonstration mode:
 1.	ESP32 Receiver; push receiver reset button; this puts the ESP32 into deep sleep.
