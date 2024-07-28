@@ -374,7 +374,7 @@ void getINA226(const char* dtStamp) {
   log.print(" , ");
   if(alertFlag){
     log.print("Under Voltage alert");
-    event = false;
+    alertFlag = false;
   }
   log.println("");
   log.close();
