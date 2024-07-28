@@ -229,6 +229,8 @@ void setup() {
     gpio_deep_sleep_hold_en();
     delay(1);
 
+    digitalWrite(TRIGGER, LOW);
+
     esp_sleep_enable_ext0_wakeup(GPIO_NUM_15, LOW);
 
     esp_deep_sleep_start();
