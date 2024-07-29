@@ -1,4 +1,4 @@
-Updated 07/28/2024 --Now included; KY002S Bi-Stable MOSFET switch and INA226 Battery Monitor
+Updated 07/29/2024 --Now included; KY002S Bi-Stable MOSFET switch and INA226 Battery Monitor
 
 Updated 07/23/2024  --Now with E220 Sleep Mode; reducing always on current to microamp range!
 
@@ -17,8 +17,8 @@ I would like to express my gratitude to ChatGPT, an AI developed by OpenAI, for 
 throughout the development of my E220 LoRa module project. The insights and support received were instrumental in overcoming 
 technical challenges and optimizing the project's performance.
 
-Thank you Renzo Mischianti for your LoRa E220 Library (xReef), E220 Ebyte E220 articles, Lora Ebyte module Community support, 
-and the Ebyte E220 Support page.
+Thank you Renzo Mischianti for your LoRa E220 Library (xReef), E220 Ebyte E220 articles, Lora Ebyte module Community support, and the Ebyte E220 Support page.
 
-Wolfgang Ewald thank you; learned much from your article "Using LoRa with the EByte E220, E22 and E32 series".  Thanks for sharing 
-your hands on experiences.
+Wolfgang Ewald thank you; learned much from your article "Using LoRa with the EByte E220, E22 and E32 series".  Thanks for sharing your hands on experiences.
+
+"E220_Remote_Switch_FTP" is a standalone FTP sketch for accessing the Battery Monitor "log.txt".  FTP Sketch was not inclded in the "E220_Remote_Switch_Receiver.ino" sketch due to using deep sleep.
