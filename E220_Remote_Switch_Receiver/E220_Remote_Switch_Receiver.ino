@@ -1,9 +1,9 @@
-//E220_Remote_Switch_Receiver.ino   Added KY002S Bi-Stable MOSFET Switch and INA226 Battery Monitor
-//William Lucid 7/28/2024 @ 01:21 EDT
+//E220_Remote_Switch_Receiver.ino
+//William Lucid 7/29/2024 @ 11:04 EDT
 
 //E220 Module is set to ADDL 2
 
-//Fully connectd schema  AUX connected to ESP32, GPIO15 --Important RTC_GPIO Pin 
+//Fully connectd schema  AUX connected to ESP32, GPIO15
 //Ardino IDE:  ESP32 Board Manager, Version 2.0.17
 
 //  See library downloads for each library license.
@@ -42,7 +42,8 @@ const int pulseDuration = 300;  // 100 milliseconds (adjust as needed)
 #define M1_PIN GPIO_NUM_19
 
 #define AUX_PIN GPIO_NUM_15
-#define TRIGGER 32  //KY002S MOSFET Bi-Stable Switch
+#define TRIGGER 32 //KY002S MOSFET Bi-Stable Switch
+#define KY002S_PIN 33  //KY002S MOSFET Bi-Stable Switch --Read output
 #define ALERT 4     //INA226 Battery Monitor
 
 #define SDA_PIN 25
@@ -109,35 +110,6 @@ LoRa_E220 e220ttl(&Serial2, 15, 21, 19);  //  RX AUX M0 M1
 //LoRa_E220 e220ttl(&Serial2, 22, 4, 33, 21, 19, UART_BPS_RATE_9600); //  esp32 RX <-- e220 TX, esp32 TX --> e220 RX AUX_PIN M0 M1
 // -------------------------------------
 
-void handleWakeupReason() {
-  esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
-  switch (wakeup_reason) {
-    case ESP_SLEEP_WAKEUP_EXT0:
-      Serial.println("Wakeup caused by external signal using RTC_IO");
-      break;
-    case ESP_SLEEP_WAKEUP_EXT1:
-      Serial.println("Wakeup caused by external signal using RTC_CNTL");
-      break;
-    case ESP_SLEEP_WAKEUP_TIMER:
-      Serial.println("Wakeup caused by timer");
-      break;
-    case ESP_SLEEP_WAKEUP_TOUCHPAD:
-      Serial.println("Wakeup caused by touchpad");
-      break;
-    case ESP_SLEEP_WAKEUP_ULP:
-      Serial.println("Wakeup caused by ULP program");
-      break;
-    default:
-      Serial.printf("Wakeup was not caused by deep sleep: %d\n", wakeup_reason);
-      break;
-  }
-}
-
-void enterSleepMode() {
-  e220ttl.setMode(MODE_3_SLEEP);
-  delay(delayTime);
-}
-
 void enterDeepSleep() {
   e220ttl.setMode(MODE_2_POWER_SAVING);
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_15, LOW);
@@ -160,12 +132,10 @@ void setup() {
   pinMode(M0_PIN, OUTPUT);
   pinMode(M1_PIN, OUTPUT);
 
-  enterSleepMode();
+  e220ttl.setMode(MODE_3_SLEEP);
+  delay(delayTime);
 
   Serial.println("\n\nE220 Remote Switch Receiver\n");
-
-  //Set default Trigger normal boot 
-  digitalWrite(TRIGGER, LOW);
 
   // Increment boot number and print it every reboot
   ++bootCount;
@@ -177,8 +147,14 @@ void setup() {
   esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_FAST_MEM, ESP_PD_OPTION_ON);
 
   pinMode(AUX_PIN, INPUT_PULLUP);  // GPIO15 WakeUp
-  pinMode(TRIGGER, OUTPUT);        // ESP32, GPIO23
+  pinMode(TRIGGER, OUTPUT);        // ESP32, GPIO32
+  pinMode(KY002S_PIN, INPUT);  //ESP32, GPIO33
   pinMode(ALERT, INPUT);          // ESP32, GPIO4
+
+  int value = digitalRead(KY002S_PIN);
+  if(value < 1){
+    digitalWrite(TRIGGER, HIGH);
+  }
 
   bool fsok = LittleFS.begin(true);
   Serial.printf_P(PSTR("\nFS init: %s\n"), fsok ? PSTR("ok") : PSTR("fail!"));
@@ -194,7 +170,7 @@ void setup() {
   ina226.enableAlertLatch();
   ina226.setAlertType(BUS_UNDER, 5);
   attachInterrupt(digitalPinToInterrupt(ALERT), alert, FALLING);
-
+  
   e220ttl.begin();
   delay(delayTime);
   e220ttl.setMode(MODE_2_WOR_RECEIVER);
@@ -203,7 +179,7 @@ void setup() {
   // Check if the wakeup was due to external GPIO
   if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT0) {
     //Serial.println("Waked up from external GPIO!");
-
+    
     gpio_hold_dis(GPIO_NUM_21);
     gpio_hold_dis(GPIO_NUM_19);
     gpio_deep_sleep_hold_dis();
@@ -227,12 +203,9 @@ void setup() {
     } else {
       Serial.println("NO HOLD 19");
     }
-    
+
     gpio_deep_sleep_hold_en();
     delay(1);
-
-    //Set default Trigger going deep sleep
-    digitalWrite(TRIGGER, LOW);
 
     esp_sleep_enable_ext0_wakeup(GPIO_NUM_15, LOW);
 
@@ -266,11 +239,15 @@ void loop() {
       e220ttl.setMode(MODE_0_NORMAL);
       delay(delayTime);
 
-      enterSleepMode();
+      e220ttl.setMode(MODE_3_SLEEP);
+      delay(delayTime);
       
       if (message.switchState == 1 ) {
         Serial.println("\nWaked up from external0 RTC GPIO!");
         Serial.println("Wake and start listening!\n");
+        //Trigger the latch (falling edge)
+        digitalWrite(TRIGGER, LOW);
+        delay(100); // Short pulse
         digitalWrite(TRIGGER, HIGH);
         Serial.println("\nBattery power switched ON");
         Serial.println("ESP32 wake from Deep Sleep\n");
@@ -278,9 +255,9 @@ void loop() {
       }     
 
       if (message.switchState == 2) {
-        digitalWrite(TRIGGER, HIGH);
         Serial.println("\nBattery power switched OFF");
         Serial.println("ESP32 going to Deep Sleep\n");
+        digitalWrite(TRIGGER, LOW);
         enterDeepSleep();
       }   
 
