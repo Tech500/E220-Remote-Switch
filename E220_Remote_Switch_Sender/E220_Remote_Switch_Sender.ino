@@ -1,6 +1,7 @@
 
+
 //E220_Remote_Switch_Sender.ino
-//William Lucid 07/19/2024 @ 19:41 EST
+//William Lucid 07/29/2024 @ 19:00 EDT
 
 //E220 Module is set to ADDL 3
 
@@ -318,8 +319,9 @@ String get_time() {
 
 void switchOne(int data) {
   if (data == 1) {
-    Serial.println("\nWaked up from external GPIO!");
-    Serial.println("Wake and start listening!\n");
+    Serial.println("\nWOR Message Sent");
+    Serial.println("ESP32 Awaken by External 0, RTC GPIO!");
+    Serial.println("\nWake and start listening!\n");
     delay(500);
     Serial.println("\nESP32 waking from Deep Sleep");  
     Serial.println("Battery Switch is ON\n"); 
