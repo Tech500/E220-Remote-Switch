@@ -22,10 +22,10 @@
 #include <INA226_WE.h>
 #include <Wire.h>
 
-#define AUX_PIN_BITMASK 0x8000
+//#define AUX_PIN_BITMASK 0x8000
 
 // Persisted RTC variable
-RTC_DATA_ATTR int bootCount = 0;
+RTC_DATA_ATTR int bootCount;
 RTC_DATA_ATTR int switch_State = 0;
 
 const int pulseDuration = 300;  // 100 milliseconds (adjust as needed)
@@ -151,9 +151,9 @@ void setup() {
   pinMode(KY002S_PIN, INPUT);  //ESP32, GPIO33
   pinMode(ALERT, INPUT);          // ESP32, GPIO4
 
-  int value = digitalRead(KY002S_PIN);
+  int value = digitalRead(KY002S_PIN);  //KY002S, Vo pin
   if(value < 1){
-    digitalWrite(TRIGGER, HIGH);
+    digitalWrite(TRIGGER, HIGH);  //KY002S, TRG pin
   }
 
   bool fsok = LittleFS.begin(true);
@@ -243,8 +243,10 @@ void loop() {
       delay(delayTime);
       
       if (message.switchState == 1 ) {
-        Serial.println("\nWaked up from external0 RTC GPIO!");
-        Serial.println("Wake and start listening!\n");
+        delay(10);
+        Serial.println("\nWOR Message Received");
+        Serial.println("ESP32 awaken by external 0, RTC GPIO!");
+        Serial.println("\nWake and start listening!\n");
         //Trigger the latch (falling edge)
         digitalWrite(TRIGGER, LOW);
         delay(100); // Short pulse
