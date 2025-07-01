@@ -21,4 +21,4 @@ Thank you Renzo Mischianti for your LoRa E220 Library (xReef), E220 Ebyte E220 a
 
 Wolfgang Ewald thank you; learned much from your article "Using LoRa with the EByte E220, E22 and E32 series".  Thanks for sharing your hands on experiences.
 
-"E220_Remote_Switch_FTP" is a standalone FTP sketch for accessing the Battery Monitor "log.txt".  FTP Sketch was not inclded in the "E220_Remote_Switch_Receiver.ino" sketch due to using deep sleep.
+"E220_Remote_Switch_FTP" is a standalone FTP sketch for accessing the Battery Monitor "log.txt".  
