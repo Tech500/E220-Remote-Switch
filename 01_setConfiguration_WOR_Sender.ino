@@ -58,10 +58,10 @@ void setup() {
 	printParameters(configuration);
 
 //	----------------------- WOR SENDER -----------------------
-	configuration.ADDL = 0x03;
+	configuration.ADDL = 0x02;
 	configuration.ADDH = 0x00;
 
-	configuration.CHAN = 68;  //918.125 Mhz.
+	configuration.CHAN = 66;  
 
 	configuration.SPED.uartBaudRate = UART_BPS_9600;
 	configuration.SPED.airDataRate = AIR_DATA_RATE_010_24;
