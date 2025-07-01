@@ -3,9 +3,8 @@
 //E220_Remote_Switch_Sender.ino
 //William Lucid 07/01/2025 @ 08:15 EDT
 
-//E220 Module is set to ADDL 3
-
-//Fully connectd schema  AUX connected to ESP32, GPIO15
+//E220 Module is set to ADDL 2
+//Fully connectd schema  AUX connected to ESP32, GPIO27
 //Ardino IDE:  ESP32 Board Manager, Version 2.0.17
 
 //  See library downloads for each library license.
