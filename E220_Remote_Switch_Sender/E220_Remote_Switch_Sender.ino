@@ -1,7 +1,7 @@
 
 
 //E220_Remote_Switch_Sender.ino
-//William Lucid 07/29/2024 @ 19:00 EDT
+//William Lucid 07/01/2025 @ 08:15 EDT
 
 //E220 Module is set to ADDL 3
 
@@ -31,7 +31,7 @@
 #define RXD2 16
 #define TXD2 17
 
-#define AUX_PIN GPIO_NUM_15
+#define AUX_PIN GPIO_NUM_27
 
 int delayTime = 100;  //setmode delay duration
 
@@ -58,14 +58,14 @@ char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursd
 char strftime_buf[64];
 
 // ---------- esp32 pins --------------
- LoRa_E220 e220ttl(&Serial2, 15, 21, 19); //  RX AUX M0 M1
+ LoRa_E220 e220ttl(&Serial2, 27, 21, 19); //  RX AUX M0 M1
 
 //LoRa_E220 e220ttl(&Serial2, 22, 4, 33, 21, 19, UART_BPS_RATE_9600); //  esp32 RX <-- e220 TX, esp32 TX --> e220 RX AUX_PIN M0 M1
 // -------------------------------------
 
 // Replace with your network details
-const char *ssid = "R2D2";
-const char *password = "sissy4357";
+const char *ssid = "Removed";
+const char *password = "Removed";
 
 AsyncWebServer server(80);
 
@@ -135,8 +135,10 @@ void interruptHandler() {
 void sendWOR(){
   e220ttl.setMode(MODE_1_WOR_TRANSMITTER);
   delay(delayTime);
+  
   // Send message
   ResponseStatus rs = e220ttl.sendFixedMessage(0, DESTINATION_ADDL, CHANNEL, "Hello, world? WOR!");
+  
   e220ttl.setMode(MODE_0_NORMAL);
   delay(delayTime);
 }
@@ -159,7 +161,7 @@ void setup() {
   
   pinMode(AUX_PIN, INPUT);
 
-  attachInterrupt(GPIO_NUM_15, interruptHandler, FALLING);
+  attachInterrupt(GPIO_NUM_18, interruptHandler, FALLING);
   
   // Startup all pins and UART
   e220ttl.begin();
@@ -396,7 +398,7 @@ void webInterface() {
 
   //getTimeDate();
 
-  String data = "http://10.0.0.27/relay";
+  String data = "http://192.168.12.27/relay";
 
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;    // Declare object of class HTTPClient
@@ -432,13 +434,13 @@ void webInterface() {
 void wifi_Start() {
 
 //Server settings
-#define ip { 10, 0, 0, 27}
+#define ip { 192, 168, 12, 27}
 #define subnet \
   { 255, 255, 255, 0 }
 #define gateway \
-  { 10, 0, 0, 1 }
+  { 192, 168, 12, 1 }
 #define dns \
-  { 10, 0, 0, 1 }
+  { 192, 168, 12, 1 }
 
   WiFi.mode(WIFI_AP_STA);
 
