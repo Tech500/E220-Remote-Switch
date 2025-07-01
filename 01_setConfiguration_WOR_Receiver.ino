@@ -2,6 +2,8 @@
  * LoRa E220
  * Set configuration.   Filename:  01_setConfiguration_WOR_Receiver.ino
  *
+ * Run as is for ESP32
+ * 
  * You must uncommend the correct constructor.
  *
  * by Renzo Mischianti <https://www.mischianti.org>
@@ -13,7 +15,7 @@
  * M1         ----- D6 (or 3.3v)	----- 21 (or 3.3v)	----- 6 (or 3.3v)			----- 4 (or 3.3v)	----- 11 (or 3.3v)	      ----- PB10 (or 3.3v)      ----- 6 Volt div (or 3.3v)
  * TX         ----- D3 (PullUP)		----- TX2 (PullUP)	----- TX1 (PullUP)			----- 14 (PullUP)	----- 8 (PullUP)	      ----- PA2 TX2 (PullUP)    ----- 4 (PullUP)
  * RX         ----- D4 (PullUP)		----- RX2 (PullUP)	----- RX1 (PullUP)			----- 13 (PullUP)	----- 9 (PullUP)	      ----- PA3 RX2 (PullUP)    ----- 5 Volt div (PullUP)
- * AUX        ----- D5 (PullUP)		----- 18  (PullUP)	----- 2  (PullUP)			----- 0  (PullUP)	----- 2  (PullUP)	      ----- PA0  (PullUP)       ----- 3 (PullUP)
+ * AUX        ----- D5 (PullUP)		----- 27  (PullUP)	----- 2  (PullUP)			----- 0  (PullUP)	----- 2  (PullUP)	      ----- PA0  (PullUP)       ----- 3 (PullUP)
  * VCC        ----- 3.3v/5v			----- 3.3v/5v		----- 3.3v/5v				----- 3.3v/5v		----- 3.3v/5v		      ----- 3.3v/5v             ----- 3.3v/5v
  * GND        ----- GND				----- GND			----- GND					----- GND			----- GND			      ----- GND                 ----- GND
  *
@@ -27,7 +29,7 @@
 //LoRa_E220 e220ttl(D2, D3); // Config without connect AUX and M0 M1
 
 // ---------- esp32 pins --------------
-LoRa_E220 e220ttl(&Serial2, 15, 21, 19); //  RX AUX M0 M1
+LoRa_E220 e220ttl(&Serial2, 27, 21, 19); //  RX AUX M0 M1
 
 //LoRa_E220 e220ttl(&Serial2, 22, 4, 18, 21, 19, UART_BPS_RATE_9600); //  esp32 RX <-- e220 TX, esp32 TX --> e220 RX AUX M0 M1
 // -------------------------------------
