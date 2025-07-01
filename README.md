@@ -1,6 +1,6 @@
-Updated 07/29/2024 --Now included; KY002S Bi-Stable MOSFET switch and INA226 Battery Monitor
+Updated 07/01/2025 --Now included; KY002S Bi-Stable MOSFET switch and INA226 Battery Monitor
 
-Updated 07/23/2024  --Now with E220 Sleep Mode; reducing always on current to microamp range!
+Updated 07/01/2025  --Now with E220 Sleep Mode; reducing always on current to microamp range!
 
 [E220-Remote-Switch Demo video with sleep mode current monitoring](https://www.youtube.com/watch?v=_cuUFP5C3NI)
 
