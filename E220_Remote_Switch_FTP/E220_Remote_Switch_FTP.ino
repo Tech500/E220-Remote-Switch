@@ -40,13 +40,13 @@ void loop(){
 void wifi_Start() {
 
 //Server settings
-#define ip { 10, 0, 0, 28 }
+#define ip { 192, 168, 12, 28 }
 #define subnet \
   { 255, 255, 255, 0 }
 #define gateway \
-  { 10, 0, 0, 1 }
+  { 192, 168,12, 1 }
 #define dns \
-  { 10, 0, 0, 1 }
+  { 192, 168, 12, 1 }
 
   WiFi.mode(WIFI_AP_STA);
 
