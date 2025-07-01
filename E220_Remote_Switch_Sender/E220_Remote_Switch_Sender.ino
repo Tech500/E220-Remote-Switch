@@ -1,7 +1,5 @@
-
-
 //E220_Remote_Switch_Sender.ino
-//William Lucid 07/01/2025 @ 08:15 EDT
+//William Lucid in colboration with ChatGPT 07/01/2025 @ 08:15 EDT
 
 //E220 Module is set to ADDL 2
 //Fully connectd schema  AUX connected to ESP32, GPIO27
