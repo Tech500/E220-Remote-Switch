@@ -6,7 +6,7 @@ Updated 07/01/2025  --Now with E220 Sleep Mode; reducing always on current to mi
 
 Demonstration mode:
 1.	ESP32 Receiver; push receiver reset button; this puts the ESP32 into deep sleep.
-2.	Open browser to "http://10.0.0.27/relay"; this will create a web request for turning on battery power. and start a countdown timer to turn off battery power, then put the ESP32 receiver into deep sleep.
+2.	Open browser to "http://192.168.12.27/relay"; this will create a web request for turning on battery power. and start a countdown timer to turn off battery power, then put the ESP32 receiver into deep sleep.
 3.	First message is the WOR message to wake the E220 Receiver module and the Deep Sleeping ESP32.  Second message from E220 Sender is required to turn on battery power and start the countdown timer. Both messages are sent when server request arrives from a click on web link to view video camera.  
 Video:  E220-Remote-Switch Demo with sleep current monitoring
 
