@@ -100,6 +100,11 @@ struct Message {
 
 Message message;
 
+void updateTimestamp() {
+  String timestamp = get_time();
+  timestamp.toCharArray(message.dateTime, MAX_dateTime_LENGTH);
+}
+
 #define FPM_SLEEP_MAX_TIME 0xFFFFFFF
 void callback() {
   Serial.println("Callback");
@@ -362,15 +367,19 @@ void loop() {
 
     if (message.switchState == 1) {
       activationCount++;  // Count this as an activation
+      updateTimestamp();
+      Serial.println(message.dateTime);
       digitalWrite(TRIGGER, LOW);
       delay(100);
       digitalWrite(TRIGGER, HIGH);
       Serial.println("Battery power switched ON");
-      getINA226(message.dateTime);
+      //getINA226(message.dateTime);
     }
 
     if (message.switchState == 2) {
       Serial.println("Battery power switched OFF");
+      updateTimestamp();
+      Serial.println(message.dateTime);
       digitalWrite(TRIGGER, LOW);
       delay(100);
       digitalWrite(TRIGGER, HIGH);
@@ -388,19 +397,6 @@ void loop() {
   
 
   ftpSrv.handleFTP();    
-}
-
-int main() {
-  // Create an instance of the Message struct
-  Message message;
-
-  // Get the timestamp using the get_time function and assign it to the struct member
-  String timestamp = get_time();
-  timestamp.toCharArray(message.dateTime, MAX_dateTime_LENGTH);
-
-  // Now you can use message.timestamp as needed...
-
-  return 0;
 }
 
 // Function to get the timestamp
