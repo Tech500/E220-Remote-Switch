@@ -1,5 +1,5 @@
 //E220_Remote_Switch_Sender.ino
-//William Lucid in colboration with ChatGPT 07/01/2025 @ 08:15 EDT
+//William Lucid in colboration with ChatGPT 11/27/2025 @ 11:52 EST
 
 //E220 Module is set to ADDL 2
 //Fully connectd schema  AUX connected to ESP32, GPIO27
@@ -21,14 +21,14 @@
 
 #import "index7.h"  //Video feed HTML; do not remove
 
-#define DESTINATION_ADDL 2
+#define DESTINATION_ADDL 3
 #define FREQENCY_915
 #define CHANNEL 66
 
 #define RXD2 16
 #define TXD2 17
 
-#define AUX_PIN GPIO_NUM_27
+#define AUX_PIN GPIO_NUM_36
 
 int delayTime = 100;  //setmode delay duration
 
@@ -55,10 +55,7 @@ char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursd
 char strftime_buf[64];
 
 // ---------- esp32 pins --------------
- LoRa_E220 e220ttl(&Serial2, 27, 21, 19); //  RX AUX M0 M1
-
-//LoRa_E220 e220ttl(&Serial2, 22, 4, 33, 21, 19, UART_BPS_RATE_9600); //  esp32 RX <-- e220 TX, esp32 TX --> e220 RX AUX_PIN M0 M1
-// -------------------------------------
+ LoRa_E220 e220ttl(&Serial2, 36, 21, 19); //  RX AUX M0 M1
 
 // Replace with your network details
 const char *ssid = "Removed";
