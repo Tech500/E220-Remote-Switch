@@ -53,7 +53,7 @@ const int pulseDuration = 300;  // 100 milliseconds (adjust as needed)
 #define M0_PIN GPIO_NUM_21
 #define M1_PIN GPIO_NUM_19
 
-#define AUX_PIN GPIO_NUM_27
+#define AUX_PIN GPIO_NUM_36
 #define TRIGGER 23     //KY002S MOSFET Bi-Stable Switch
 #define KY002S_PIN 33  //KY002S MOSFET Bi-Stable Switch --Read output
 #define ALERT 4        //INA226 Battery Monitor
@@ -117,7 +117,7 @@ void IRAM_ATTR wakeUp() {
 void printParameters(struct Configuration configuration);
 
 // ---------- esp32 pins ----------------
-LoRa_E220 e220ttl(&Serial2, 27, 21, 19);  //  RX AUX M0 M1
+LoRa_E220 e220ttl(&Serial2, 36, 21, 19);  //  RX AUX M0 M1
 
 //LoRa_E220 e220ttl(&Serial2, 22, 4, 33, 21, 19, UART_BPS_RATE_9600); //  esp32 RX <-- e220 TX, esp32 TX --> e220 RX AUX_PIN M0 M1
 // -------------------------------------
@@ -137,7 +137,8 @@ void enterDeepSleep() {
   gpio_deep_sleep_hold_en();
 
   // Set EXT0 wake on AUX pin (LOW)
-  esp_sleep_enable_ext0_wakeup(GPIO_NUM_27, LOW);
+  pinMode(GPIO_NUM_36, INPUT);  // external pulldown/pullup required
+  esp_sleep_enable_ext0_wakeup(GPIO_NUM_36, LOW);
 
   Serial.println("Entering deep sleep now...");
   Serial.flush();
