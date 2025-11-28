@@ -101,7 +101,7 @@ struct Message {
 Message message;
 
 void updateTimestamp() {
-  String timestamp = get_time();
+  String timestamp;
   timestamp.toCharArray(message.dateTime, MAX_dateTime_LENGTH);
 }
 
@@ -288,7 +288,7 @@ void setup() {
   pinMode(ALERT, INPUT);           // ESP32, GPIO4
 
   int value = digitalRead(KY002S_PIN);  //KY002S, Vo pin
-  if (value < 1) {
+  if (value == 0) {
     digitalWrite(TRIGGER, HIGH);  //KY002S, TRG pin
   }
 
